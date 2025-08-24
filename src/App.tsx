@@ -10,6 +10,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Students from './pages/Students';
 import Attendance from './pages/Attendance';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,8 +36,8 @@ const App = () => {
               <Route path="/students" element={<Students />} />
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/assignments" element={<div className="text-center py-12"><h2 className="text-2xl font-bold">Assignments - Coming Soon</h2></div>} />
-              <Route path="/reports" element={<div className="text-center py-12"><h2 className="text-2xl font-bold">Reports - Coming Soon</h2></div>} />
-              <Route path="/settings" element={<div className="text-center py-12"><h2 className="text-2xl font-bold">Settings - Coming Soon</h2></div>} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

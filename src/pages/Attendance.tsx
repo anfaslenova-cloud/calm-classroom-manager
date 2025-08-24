@@ -3,16 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   ClipboardCheck, 
-  Calendar,
+  Calendar as CalendarIcon,
   Users,
   Check,
   X,
   Clock,
   Save
 } from 'lucide-react';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 type AttendanceStatus = 'present' | 'absent' | 'late';
 
@@ -24,7 +28,9 @@ interface Student {
 }
 
 const Attendance = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const { toast } = useToast();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [viewDate, setViewDate] = useState<Date>(new Date());
   const [students, setStudents] = useState<Student[]>([
     { id: 1, name: 'John Doe', rollNo: '001', status: 'present' },
     { id: 2, name: 'Jane Smith', rollNo: '002', status: 'present' },
@@ -46,6 +52,53 @@ const Attendance = () => {
 
   const markAllAbsent = () => {
     setStudents(prev => prev.map(student => ({ ...student, status: 'absent' as AttendanceStatus })));
+  };
+
+  const saveAttendance = () => {
+    // Save attendance to localStorage
+    const attendanceData = {
+      date: selectedDate.toISOString().split('T')[0],
+      students: students.map(s => ({ id: s.id, name: s.name, rollNo: s.rollNo, status: s.status })),
+      timestamp: new Date().toISOString()
+    };
+    
+    const existingData = JSON.parse(localStorage.getItem('classtrack_attendance') || '[]');
+    const updatedData = existingData.filter((d: any) => d.date !== attendanceData.date);
+    updatedData.push(attendanceData);
+    localStorage.setItem('classtrack_attendance', JSON.stringify(updatedData));
+    
+    toast({
+      title: "Attendance Saved",
+      description: `Attendance for ${format(selectedDate, 'PPP')} has been saved successfully.`,
+    });
+  };
+
+  const loadAttendanceForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const savedData = JSON.parse(localStorage.getItem('classtrack_attendance') || '[]');
+    const dayData = savedData.find((d: any) => d.date === dateStr);
+    
+    if (dayData) {
+      setStudents(dayData.students);
+      toast({
+        title: "Attendance Loaded",
+        description: `Showing attendance for ${format(date, 'PPP')}`,
+      });
+    } else {
+      // Reset to default if no data found
+      setStudents([
+        { id: 1, name: 'John Doe', rollNo: '001', status: 'present' },
+        { id: 2, name: 'Jane Smith', rollNo: '002', status: 'present' },
+        { id: 3, name: 'Mike Johnson', rollNo: '003', status: 'present' },
+        { id: 4, name: 'Sarah Wilson', rollNo: '004', status: 'present' },
+        { id: 5, name: 'David Brown', rollNo: '005', status: 'present' },
+        { id: 6, name: 'Emily Davis', rollNo: '006', status: 'present' },
+      ]);
+      toast({
+        title: "No Data Found",
+        description: `No attendance data found for ${format(date, 'PPP')}. Showing default view.`,
+      });
+    }
   };
 
   const getStatusStats = () => {
@@ -93,13 +146,61 @@ const Attendance = () => {
           <p className="text-muted-foreground">Mark attendance for Class 5A</p>
         </div>
         <div className="flex items-center space-x-3">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-4 py-2 rounded-2xl border border-input bg-background text-foreground"
-          />
-          <Button variant="primary" className="flex items-center space-x-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  "px-4 py-2 rounded-2xl"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(selectedDate, "PPP")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  if (date) {
+                    setSelectedDate(date);
+                  }
+                }}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center space-x-2 px-4 py-2 rounded-2xl"
+              >
+                <CalendarIcon className="w-4 h-4" />
+                <span>View Date</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={viewDate}
+                onSelect={(date) => {
+                  if (date) {
+                    setViewDate(date);
+                    loadAttendanceForDate(date);
+                  }
+                }}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Button onClick={saveAttendance} variant="primary" className="flex items-center space-x-2">
             <Save className="w-4 h-4" />
             <span>Save Attendance</span>
           </Button>
@@ -197,13 +298,8 @@ const Attendance = () => {
       <Card className="shadow-soft border-0">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            <span>Attendance for {new Date(selectedDate).toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</span>
+            <CalendarIcon className="w-5 h-5 text-primary" />
+            <span>Attendance for {format(selectedDate, 'EEEE, MMMM do, yyyy')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
