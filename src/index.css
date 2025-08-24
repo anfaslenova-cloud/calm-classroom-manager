@@ -2,43 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* CLASS TRACK Design System - Calm & Professional Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* CLASS TRACK Brand Colors */
+    --background: 220 14% 96%;  /* Light Gray #F3F4F6 */
+    --foreground: 224 71% 10%;  /* Dark Gray #111827 */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 224 71% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 224 71% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 224 76% 33%;     /* Deep Blue #1E3A8A */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 224 71% 10%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 14% 91%;
+    --muted-foreground: 224 38% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 158 85% 40%;      /* Emerald Green #10B981 */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 224 76% 33%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;  /* 2xl rounded corners as requested */
 
-    --sidebar-background: 0 0% 98%;
+    /* CLASS TRACK Custom Properties */
+    --success: 158 85% 40%;  /* Emerald Green */
+    --warning: 45 93% 47%;   /* Amber */
+    --info: 224 76% 33%;     /* Deep Blue */
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(224, 76%, 33%), hsl(224, 76%, 45%));
+    --gradient-accent: linear-gradient(135deg, hsl(158, 85%, 40%), hsl(158, 85%, 52%));
+    --gradient-hero: linear-gradient(135deg, hsl(224, 76%, 33%) 0%, hsl(158, 85%, 40%) 100%);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 6px -1px hsl(224 76% 33% / 0.1), 0 2px 4px -1px hsl(224 76% 33% / 0.06);
+    --shadow-medium: 0 10px 15px -3px hsl(224 76% 33% / 0.1), 0 4px 6px -2px hsl(224 76% 33% / 0.05);
+    --shadow-large: 0 25px 50px -12px hsl(224 76% 33% / 0.25);
+
+    --sidebar-background: 220 14% 96%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
 
@@ -100,6 +114,100 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* CLASS TRACK Animations */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  
+  .animate-splash {
+    animation: splash 3s ease-in-out forwards;
+  }
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .shadow-large {
+    box-shadow: var(--shadow-large);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
